@@ -256,7 +256,7 @@
         <div class="container">
             <img src="appicon.png" alt="呆头鹅图标" class="app-icon">
             <h1>呆头鹅</h1>
-            <p class="subtitle">一款语音包管理工具，让直播与语音聊天更有趣。</p>
+            <p class="subtitle">一款语音包管理工具，让直播和语音聊天更有趣。</p>
             <div style="position: relative; z-index: 10;">
                 <button onclick="triggerDownload()" class="btn" style="border: none; cursor: pointer; font-family: inherit;">📦 点击下载最新版本</button>
             </div>
@@ -297,15 +297,10 @@
     </footer>
 
     <script>
-        // 下载并计数
         function triggerDownload() {
-            // 发送计数请求（不等待结果，不影响下载）
             fetch('/count').catch(err => console.error('计数请求失败:', err));
-            // 打开真实下载地址
             window.open('https://gitee.com/dayuncloud/daitoue/releases/download/latest/daitoue.exe', '_blank');
         }
-
-        // 定义 window.get 属性，访问时触发请求并打印计数
         Object.defineProperty(window, 'get', {
             get: function() {
                 fetch('/stats')
