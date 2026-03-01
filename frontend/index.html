@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>呆头鹅</title>
+    <link href="/main.css" rel="stylesheet"/>
+</head>
+<body>
+    <div class="app-layout">
+        <nav class="sidebar">
+            <div class="sidebar-drag-area"></div>
+            <div class="logo">
+                <img src="/appicon.png" alt="logo">
+                <span>呆头鹅</span>
+            </div>
+            <button class="tab-btn active" onclick="switchTab('import')">
+                <span class="icon">🏠</span> <span>主页</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('settings')">
+                <span class="icon">⚙️</span> <span>设置</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('about')">
+                <span class="icon">ℹ️</span> <span>关于</span>
+            </button>
+            
+            <button class="collapse-btn" onclick="toggleSidebar()">
+                <span class="icon">◀</span>
+            </button>
+        </nav>
+
+        <div class="main-column">
+            <div class="title-bar">
+                <div class="title-drag-region"></div>
+                <div class="window-controls">
+                    <button class="win-btn minimize" onclick="winMin()">
+                        <svg width="10" height="1" viewBox="0 0 10 1" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="10" height="1" fill="currentColor"/>
+                        </svg>
+                    </button>
+                    <button class="win-btn maximize" onclick="winMax()">
+                        <svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1.5" y="1.5" width="7" height="7" stroke="currentColor" fill="none" stroke-width="1"/>
+                        </svg>
+                    </button>
+                    <button class="win-btn close" onclick="winClose()">
+                        <svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <main class="content">
+            <div id="import" class="tab-pane active">
+                <div class="header">
+                    <h2>音频管理</h2>
+                    <button class="btn-primary" onclick="importAudio()">+ 添加音频</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <colgroup>
+                            <col style="width: 40%">
+                            <col style="width: 10%">
+                            <col style="width: 25%">
+                            <col style="width: 25%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>时长</th>
+                                <th>热键</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="import-list">
+                            <!-- Items will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="settings" class="tab-pane">
+                <div class="header">
+                    <h2>音频设置</h2>
+                    <button class="btn-secondary" onclick="resetAudio()" style="padding: 4px 10px; font-size: 12px;">↺ 重置音频服务</button>
+                </div>
+
+                <div class="settings-group">
+                    <div class="control-row">
+                        <div class="control-item">
+                            <label>主播放设备</label>
+                            <select id="main-device-select" onchange="saveAudioSettings()">
+                                <!-- Options loaded via JS -->
+                            </select>
+                        </div>
+                        <div class="control-item">
+                            <label>辅助播放设备</label>
+                            <select id="aux-device-select" onchange="saveAudioSettings()">
+                                <option value="none">无</option>
+                                <!-- Options loaded via JS -->
+                            </select>
+                        </div>
+                        <div class="control-item">
+                            <label>音量 (<span id="volume-val">100%</span>)</label>
+                            <input type="range" id="volume-slider" min="0" max="100" value="100" oninput="changeVolume(this.value)" onchange="saveAudioSettings()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="about" class="tab-pane">
+                <div class="about-card">
+                    <img src="/appicon.png" alt="logo" class="about-logo">
+                    <div class="info">
+                        <p>版本: 1.1.6 <a href="#" onclick="checkForUpdates()" style="margin-left: 10px; font-size: 12px; color: var(--primary-color); text-decoration: none;">检查更新</a></p>
+                        <p>开发者: <a href="#" onclick="openExternalLink('https://space.bilibili.com/192702710')" class="author-link">dayun</a></p>
+                    </div>
+                    <div class="about-links" style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center;">
+                        <a href="#" onclick="openExternalLink('https://daitoue.dayun.cool')" class="usage-link">呆头鹅</a>
+                        <span style="margin: 0 10px; color: #ccc;">|</span>
+                        <a href="#" onclick="showUsageModal()" class="usage-link">使用说明</a>
+                        <span style="margin: 0 10px; color: #ccc;">|</span>
+                        <a href="#" onclick="openExternalLink('https://pan.quark.cn/s/a430f9da7e75')" class="usage-link">获取语音包</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    </div>
+
+    <div id="notification-area"></div>
+
+    <div id="usage-modal" class="modal-overlay">
+        <div class="modal" style="width: 600px; max-width: 90%; text-align: left; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                <h3 style="margin: 0; color: var(--primary-color);">【新手必看】三步设置，让语音包生效</h3>
+                <button onclick="closeUsageModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999;">&times;</button>
+            </div>
+            
+            <div class="instructions-content" style="max-height: 75vh; overflow-y: auto; padding-right: 5px;">
+                <div class="step-item">
+                    <h4>第1步：安装 VB-CABLE 虚拟声卡</h4>
+                    <p>1. <a href="#" onclick="openExternalLink('https://gitee.com/dayuncloud/daitoue/raw/main/VBCABLE_Driver_Pack45.zip')">点击下载压缩包 (1.25MB)</a> 
+                    &nbsp;&nbsp;|&nbsp;&nbsp; 
+                    <a href="#" onclick="openExternalLink('https://pan.quark.cn/s/1d0ff933a502')">备用链接1</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp; 
+                    <a href="#" onclick="openExternalLink('https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip')">备用链接2</a>
+                </p>
+                    <p>2. 解压后找到 <code>VBCABLE_Setup_x64.exe</code> 右键以管理员运行进行安装</p>
+                </div>
+
+                <div class="step-item">
+                    <h4>第2步：设置麦克风输入</h4>
+                    <p>1. 右键任务栏喇叭 → 打开声音设置</p>
+                    <p>2. 将默认播放设备设置为你的扬声器或耳机</p>
+                    <p>3. 进入"录制"选项卡，右键你的麦克风 → 属性 → "侦听"选项卡</p>
+                    <p>4. 勾选"侦听此设备"，设备选择 <strong>CABLE Input</strong></p>
+                </div>
+
+                <div class="step-item">
+                    <h4>第3步：软件设置</h4>
+                    <p>1. 打开本软件设置界面，将辅助播放设备设置为 <strong>CABLE Input</strong></p>
+                    <p>2. 打开微信/QQ/YY/游戏的音频设置，把麦克风改为 <strong>CABLE Output</strong></p>
+                </div>
+                
+                <p class="note">完成后，说话声音和语音包声音，对方都能听到。</p>
+            </div>
+            
+            <div class="modal-actions" style="margin-top: 10px; margin-bottom: 0;">
+                <button class="btn-modal btn-primary" onclick="closeUsageModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="close-modal" class="modal-overlay">
+        <div class="modal">
+            <h3>关闭选项</h3>
+            <p>您希望如何操作？</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-primary" onclick="confirmClose('minimize')">最小化到托盘</button>
+                <button class="btn-modal btn-danger" onclick="confirmClose('quit')">直接退出</button>
+            </div>
+            <label class="checkbox-label">
+                <input type="checkbox" id="dont-ask-checkbox"> 不再提示
+            </label>
+        </div>
+    </div>
+
+    <div id="update-modal" class="modal-overlay">
+        <div class="modal">
+            <h3 id="update-title">检查更新</h3>
+            <p id="update-message">正在检查更新...</p>
+            <div class="modal-actions" id="update-actions">
+                <button class="btn-modal btn-primary" onclick="closeUpdateModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+build/*
+!build/appicon.png
+!build/icon.ico
+开发文档.md

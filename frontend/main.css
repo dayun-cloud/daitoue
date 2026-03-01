@@ -1,0 +1,875 @@
+:root {
+    --primary-color: #66a7bd;
+    --secondary-color: #88cfde;
+    --accent-color: #77bbcd;
+    --text-color: #2c3e50;
+    --bg-color: #f5f7fa;
+    --sidebar-width: 220px;
+    --danger-color: #e74c3c;
+    --success-color: #2ecc71;
+    --titlebar-height: 42px;
+}
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-drag: none;
+    outline: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: white;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+    background: #afd6e1bd; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #8fbcc9b8; 
+}
+
+.app-layout {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+}
+
+.main-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
+}
+
+.title-bar {
+    height: var(--titlebar-height);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    background: white;
+    position: relative; /* For divider */
+    flex-shrink: 0;
+}
+
+/* Light divider line on the right side */
+.title-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0; /* Changed from var(--sidebar-width) to 0 */
+    right: 0;
+    height: 1px;
+    background: #e8e8e8; /* Light divider color */
+    z-index: 1001;
+}
+
+.title-drag-region {
+    flex: 1;
+    height: 100%;
+    /* Remove split background */
+    background: transparent;
+    --wails-draggable: drag;
+}
+
+.window-controls {
+    display: flex;
+    flex-direction: row; /* Ensure horizontal layout */
+    height: 100%;
+    align-items: center;
+    --wails-draggable: no-drag;
+}
+
+.win-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    width: 55px;
+    height: 100%; /* Fill title bar height */
+    min-height: 42px; /* Ensure minimum height */
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.2s;
+    font-size: 16px;
+    padding: 0;
+    margin: 0; /* Remove potential margins */
+    line-height: 1; /* Reset line height */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.win-btn svg {
+    transform: scale(1.2); /* Make icons slightly larger */
+}
+
+.win-btn:hover {
+    background: transparent;
+}
+
+.win-btn.hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.win-btn.close.hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+.app-container {
+    /* Removed as it's replaced by app-layout */
+    display: none; 
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    z-index: 10;
+    transition: width 0.3s ease;
+    position: relative;
+    height: 100%; /* Full height */
+    flex-shrink: 0;
+    overflow: hidden; /* Prevent content overflow during transition */
+}
+
+/* Make top of sidebar draggable to match title bar height */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px; /* Increased height to cover logo and above area */
+    --wails-draggable: drag;
+    z-index: 0; /* Changed from -1 to 0 to be interactive */
+}
+/* Actually, wails drag property needs to be on an element on top. */
+/* Let's just make the logo draggable */
+.logo {
+    /* Removed drag from logo itself, let the overlay handle it? No, overlay is behind */
+    /* If we want the area ABOVE logo to be draggable, we need an element there */
+    position: relative; 
+    z-index: 1;
+    pointer-events: none; /* Let clicks pass through to drag layer? But then text selection... */
+    /* Wait, logo needs to be draggable too */
+    --wails-draggable: drag;
+}
+
+/* Add a dedicated drag area at the top of sidebar */
+.sidebar-drag-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px; /* Top 50px draggable */
+    z-index: 5; /* Above background but below interactive elements if any */
+    --wails-draggable: drag;
+}
+
+.sidebar.collapsed {
+    width: 80px; /* Collapsed width */
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 37px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Keep logo centered */
+    gap: 8px;
+    transition: all 0.3s ease;
+    height: 40px; /* Fixed height to prevent jump */
+}
+
+.logo img {
+    width: 38px;
+    height: 38px;
+    transition: margin 0.3s ease;
+    flex-shrink: 0; /* Prevent image shrinking */
+}
+
+.logo span {
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.2s ease, width 0.3s ease;
+    overflow: hidden;
+    display: inline-block;
+    width: auto; /* Allow natural width */
+}
+
+.sidebar.collapsed .logo {
+    gap: 0;
+}
+
+.sidebar.collapsed .logo span {
+    opacity: 0;
+    width: 0;
+    margin: 0;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 15px 0; /* Changed horizontal padding to 0 and handle indent via flex/margin */
+    padding-left: 30px; /* Fixed left padding for icon */
+    width: 100%; /* Ensure button takes full width */
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease; /* Removed border-left transition */
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* Prevent text wrapping */
+    position: relative; /* For pseudo-element border */
+}
+
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.tab-btn.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    /* border-left: 4px solid white; Removed layout-shifting border */
+}
+
+/* Use pseudo-element for border to avoid layout shift */
+.tab-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: white;
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+}
+
+.tab-btn.active::before {
+    transform: scaleY(1);
+}
+
+.tab-btn .icon {
+    margin-right: 15px;
+    font-size: 22px; /* Fixed larger size for both states */
+    width: 30px; /* Fixed width for icon container alignment */
+    text-align: center;
+    flex-shrink: 0; /* Prevent icon shrinking */
+}
+
+.tab-btn span:not(.icon) {
+    opacity: 1;
+    transition: opacity 0.2s ease, transform 0.3s ease;
+    transform: translateX(0);
+}
+
+.sidebar.collapsed .tab-btn {
+    padding-left: 0; /* Reset padding */
+    justify-content: center; /* Center icon */
+}
+
+.sidebar.collapsed .tab-btn .icon {
+    margin-right: 0;
+}
+
+.sidebar.collapsed .tab-btn span:not(.icon) {
+    opacity: 0;
+    transform: translateX(10px);
+    width: 0;
+    overflow: hidden;
+    position: absolute; /* Take out of flow to prevent layout issues */
+    pointer-events: none;
+}
+
+.collapse-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    z-index: 20; /* Ensure it stays on top */
+}
+
+.collapse-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.collapse-btn .icon {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed .collapse-btn .icon {
+    transform: rotate(180deg);
+}
+
+
+.content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-pane {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-pane.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+.header h2 {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+    background: var(--accent-color);
+}
+
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 8px;
+    background: #f9f9f9;
+    padding: 0; /* Remove padding to make sticky header work correctly */
+    margin: 10px; /* Use margin instead */
+    border: 1px solid #eee;
+}
+
+/* Specific for table container */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    display: block; /* Force display */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: separate; /* Required for sticky header border */
+    border-spacing: 0;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    background-color: #f9f9f9; /* Match container background or white */
+    color: #888;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Slight shadow to separate */
+}
+
+.data-table tr:hover {
+    background-color: #f0f8ff;
+}
+
+.btn-danger {
+    background: #888;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.btn-secondary {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.btn-preview {
+    background: #66a7bd;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.hotkey-input {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    min-width: 80px;
+    text-align: center;
+    cursor: pointer;
+    background: white;
+}
+
+.hotkey-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(102, 167, 189, 0.2);
+}
+
+.about-card {
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.about-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 10px;
+}
+
+.about-card .info {
+    margin-top: 5px;
+    color: #888;
+    line-height: 1.3;
+    font-size: 14px;
+}
+
+.instructions-card {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    overflow-y: auto;
+    flex: 1; /* Fill remaining space */
+    display: flex;
+    flex-direction: column;
+}
+
+.instructions-card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.step-item {
+    margin-bottom: 8px;
+}
+
+.step-item h4 {
+    margin: 0 0 4px 0;
+    color: #2c3e50;
+    font-size: 15px;
+}
+
+.step-item p {
+    margin: 2px 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.4;
+    padding-left: 10px;
+}
+
+.step-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.step-item a:hover {
+    text-decoration: underline;
+}
+
+.step-item code {
+    background: #e8f4f8;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #c0392b;
+}
+
+.note {
+    margin-top: 10px;
+    padding: 8px;
+    background: #fff;
+    border-left: 4px solid var(--accent-color);
+    color: #666;
+    font-size: 14px;
+}
+
+.author-link {
+    color: #888;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-weight: 500;
+}
+
+.author-link:hover {
+    color: #77bbcd;
+    text-decoration: underline;
+}
+
+.usage-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 1px dashed var(--primary-color);
+    transition: all 0.2s;
+    font-size: 13px;
+}
+
+.usage-link:hover {
+    color: var(--accent-color);
+    border-bottom-style: solid;
+}
+
+/* Notification Area */
+#notification-area {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 2000;
+}
+
+.notification {
+    background: white;
+    border-left: 4px solid var(--primary-color);
+    padding: 15px 25px;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    min-width: 300px;
+    text-align: center;
+    animation: slideDown 0.3s ease;
+    opacity: 0.98;
+}
+
+.notification.error {
+    border-left-color: var(--danger-color);
+}
+
+.notification.success {
+    border-left-color: var(--success-color);
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 0.98; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; }
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 380px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal h3 {
+    margin-top: 0;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 25px 0;
+}
+
+.btn-modal {
+    min-width: 120px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.2s;
+}
+
+.btn-modal:hover {
+    opacity: 0.9;
+}
+
+.checkbox-label {
+    display: block;
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Settings Section */
+.settings-group {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.settings-group h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    font-size: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.control-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    align-items: center;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 140px;
+    flex: 1;
+}
+
+.control-item label {
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+}
+
+.control-item select, .control-item input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+}
+
+.control-item select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+input[type=range] {
+    width: 100%;
+    max-width: 300px;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* Drag and Drop Sorting Styles */
+.audio-row .drag-handle {
+    cursor: grab;
+    position: relative;
+}
+
+.audio-row .drag-handle:active {
+    cursor: grabbing;
+}
+
+.dragging-ghost {
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 10000;
+    display: table; /* Maintain table layout */
+}
+
+/* Ensure ghost cells have width */
+.dragging-ghost td {
+    border-bottom: 1px solid #eee;
+    box-sizing: border-box;
+    vertical-align: middle; /* Center content vertically */
+    padding: 12px 15px; /* Match original table cell padding */
+}
+
+/* Explicit column widths for table and ghost */
+.data-table col:nth-child(1), .dragging-ghost td:nth-child(1) { width: 40%; }
+.data-table col:nth-child(2), .dragging-ghost td:nth-child(2) { width: 10%; }
+.data-table col:nth-child(3), .dragging-ghost td:nth-child(3) { width: 25%; }
+.data-table col:nth-child(4), .dragging-ghost td:nth-child(4) { width: 25%; }
+
+.sortable-placeholder {
+    background: #f0f8ff;
+    border: 2px dashed #88cfde;
+}
+
+.sortable-placeholder td {
+    padding: 0;
+}
+
+/* Custom Scrollbar for Settings */
+#settings {
+    overflow-y: auto;
+}
+
+#about {
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 20vh;
+}
+
+/* Responsive sidebar */
+@media (max-width: 800px) {
+    :root {
+        --sidebar-width: 160px;
+    }
+    .sidebar {
+        padding-top: 0px;
+        padding-bottom: 10px;
+    }
+    .logo {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    .logo img {
+        width: 30px;
+        height: 30px;
+    }
+    .tab-btn {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+    .tab-btn .icon {
+        margin-right: 5px;
+        font-size: 16px;
+    }
+}
+
+/* About page instructions toggle */
+details summary {
+    color: var(--primary-color);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    list-style: none;
+}
+details summary::-webkit-details-marker {
+    display: none;
+}
+details summary:hover {
+    text-decoration: underline;
+}

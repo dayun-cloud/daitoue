@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>呆头鹅 - 语音包管理工具</title>
+    <link rel="icon" href="appicon.png" type="image/png">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #77bbcd 0%, #66a7bd 50%, #88cfde 100%);
+            --primary-color: #66a7bd;
+            --text-color: #333;
+            --bg-color: #f5f7fa;
+            --white: #ffffff;
+            --card-shadow: 0 4px 20px rgba(119, 187, 205, 0.15);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background: var(--primary-gradient);
+            padding: 35px 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: var(--bg-color);
+            transform: skewY(-2deg);
+        }
+        .app-icon {
+            width: 130px;
+            height: 130px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+        .subtitle {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.95);
+            margin: 10px 0 20px;
+            font-weight: 300;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: rgb(255, 255, 255);
+            color: #66a7bd;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 1em;
+            position: relative;
+            z-index: 1;
+            margin: 0 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            color: #77bbcd;
+        }
+        .backup-link {
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: block;
+        }
+        .backup-link a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+            transition: all 0.2s;
+        }
+        .backup-link a:hover {
+            color: white;
+            border-bottom-style: solid;
+        }
+        section {
+            padding: 50px 0;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background: #000;
+            border: 4px solid white;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .feature-card {
+            background: var(--white);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            display: inline-block;
+            background: linear-gradient(135deg, #e6f7fa 0%, #ffffff 100%);
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+            color: #66a7bd;
+        }
+        .feature-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
+            font-size: 1.3em;
+            color: #444;
+        }
+        .guide-steps {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        .guide-steps ol {
+            padding-left: 20px;
+            counter-reset: none;
+            list-style: decimal;
+        }
+        .guide-steps li {
+            margin-bottom: 15px;
+            position: static;
+            padding-left: 0;
+        }
+        .guide-steps li::before {
+            content: none;
+        }
+        .guide-steps strong {
+            color: inherit;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            color: #444;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: var(--primary-gradient);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #888;
+            font-size: 0.9em;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        footer a {
+            color: #66a7bd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        #back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        #back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="back-to-top" title="回到顶部">▲</div>
+    <header>
+        <div class="container">
+            <img src="appicon.png" alt="呆头鹅图标" class="app-icon">
+            <h1>呆头鹅</h1>
+            <p class="subtitle">一款语音包管理工具，让直播与语音聊天更有趣。</p>
+            <div style="position: relative; z-index: 10;">
+                <button onclick="window.open('https://gitee.com/dayuncloud/daitoue/releases/download/latest/daitoue.exe', '_blank')" class="btn" style="border: none; cursor: pointer; font-family: inherit;">📦 点击下载最新版本</button>
+            </div>
+        </header>
+
+    <section id="video">
+        <div class="container">
+            <h2 class="section-title">📺 功能演示</h2>
+            <div class="video-container">
+                <iframe src="https://player.bilibili.com/player.html?bvid=BV1S6fpB8ESA&page=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section id="guide">
+        <div class="container">
+            <h2 class="section-title">📖 使用指南</h2>
+            <div class="guide-steps">
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li><strong>导入音频</strong>：点击“添加音频”按钮选择本地文件或直接拖入音频文件。</li>
+                    <li><strong>删除音频</strong>：在列表中点击“删除”按钮即可删除，不会删除源文件。</li>
+                    <li><strong>拖动排序</strong>：在列表中拖动音频项，即可调整顺序。</li>
+                    <li><strong>设置热键</strong>：点击音频对应的输入框，按下键盘组合键（如 <code>Ctrl+F1</code>）即可设置热键。按下 <code>Escape</code> 或 <code>Esc</code> 键可清除热键。</li>
+                    <li><strong>播放音频</strong>：按下设置好的热键，或点击“试听”。</li>
+                </ul>
+                <p style="margin-top: 20px; color: #666; font-size: 0.9em; border-left: 4px solid #ddd; padding-left: 10px;">
+                    <strong>注意</strong>：<br>由于使用了全局键盘钩子，可能需要以管理员身份运行生成的程序，以确保热键在所有窗口（特别是全屏游戏）中生效。<br>
+                    <strong>语音的时候想让对方也能听到语音包，请查看上方的视频教程。</strong>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Made with ❤️ by <a href="https://space.bilibili.com/192702710" target="_blank">dayun</a></p>
+        </div>
+    </footer>
+
+    <script>
+        const backToTopBtn = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>
