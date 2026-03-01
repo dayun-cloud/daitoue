@@ -258,7 +258,7 @@
             <h1>呆头鹅</h1>
             <p class="subtitle">一款语音包管理工具，让直播与语音聊天更有趣。</p>
             <div style="position: relative; z-index: 10;">
-                <button onclick="window.open('https://gitee.com/dayuncloud/daitoue/releases/download/latest/daitoue.exe', '_blank')" class="btn" style="border: none; cursor: pointer; font-family: inherit;">📦 点击下载最新版本</button>
+                <button onclick="triggerDownload()" class="btn" style="border: none; cursor: pointer; font-family: inherit;">📦 点击下载最新版本</button>
             </div>
         </header>
 
@@ -297,6 +297,26 @@
     </footer>
 
     <script>
+        // 下载并计数
+        function triggerDownload() {
+            // 发送计数请求（不等待结果，不影响下载）
+            fetch('/count').catch(err => console.error('计数请求失败:', err));
+            // 打开真实下载地址
+            window.open('https://gitee.com/dayuncloud/daitoue/releases/download/latest/daitoue.exe', '_blank');
+        }
+
+        // 定义 window.get 属性，访问时触发请求并打印计数
+        Object.defineProperty(window, 'get', {
+            get: function() {
+                fetch('/stats')
+                    .then(response => response.text())
+                    .then(count => console.log(`当前下载量: ${count}`))
+                    .catch(err => console.error('获取下载量失败:', err));
+                return '正在获取下载量...';
+            },
+            configurable: true
+        });
+
         const backToTopBtn = document.getElementById('back-to-top');
         
         window.addEventListener('scroll', () => {
